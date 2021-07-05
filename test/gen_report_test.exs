@@ -19,4 +19,18 @@ defmodule GenReportTest do
       assert response == {:error, "Insira o nome de um arquivo"}
     end
   end
+
+  describe "build_from_many/1" do
+    test "When passing filesname return a report" do
+      response = GenReport.build_from_many(["report_1.csv", "report_2.csv", "report_3.csv"])
+
+      assert response == ReportFixture.build()
+    end
+
+    test "When sent a invalid format file" do
+      response = GenReport.build_from_many("report_1.csv")
+
+      assert {:error, "Please provide a list of strings"} = response
+    end
+  end
 end
