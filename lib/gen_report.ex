@@ -8,7 +8,7 @@ defmodule GenReport do
   def build(filename) do
     filename
     |> Parser.parse_file()
-    |> build_report()
+    |> report_sctruct()
   end
 
   def build(), do: {:error, "Insira o nome de um arquivo"}
@@ -25,27 +25,31 @@ defmodule GenReport do
     end)
   end
 
-  def sum_reports(
-        %{
-          "all_hours" => all_hours1,
-          "hours_per_month" => hours_per_month1,
-          "hours_per_year" => hours_per_year1
-        },
-        %{
-          "all_hours" => all_hours2,
-          "hours_per_month" => hours_per_month2,
-          "hours_per_year" => hours_per_year2
-        }
-      ) do
+  defp report_sctruct(report) do
+    build_report(
+      AllHours.build(report),
+      HoursPerMonth.build(report),
+      HoursPerYear.build(report)
+    )
+  end
+
+  defp sum_reports(
+         %{
+           "all_hours" => all_hours1,
+           "hours_per_month" => hours_per_month1,
+           "hours_per_year" => hours_per_year1
+         },
+         %{
+           "all_hours" => all_hours2,
+           "hours_per_month" => hours_per_month2,
+           "hours_per_year" => hours_per_year2
+         }
+       ) do
     all_hours = merge_maps(all_hours1, all_hours2)
     hours_per_month = merge_nested_maps(hours_per_month1, hours_per_month2)
     hours_per_year = merge_nested_maps(hours_per_year1, hours_per_year2)
 
-    %{
-      "all_hours" => all_hours,
-      "hours_per_month" => hours_per_month,
-      "hours_per_year" => hours_per_year
-    }
+    build_report(all_hours, hours_per_month, hours_per_year)
   end
 
   defp merge_nested_maps(map1, map2) do
@@ -58,32 +62,10 @@ defmodule GenReport do
     Map.merge(map1, map2, fn _key, value1, value2 -> value1 + value2 end)
   end
 
-  defp build_report(report) do
-    %{
-      "all_hours" => AllHours.build(report),
-      "hours_per_month" => HoursPerMonth.build(report),
-      "hours_per_year" => HoursPerYear.build(report)
+  defp build_report(all_hours, hours_per_month, hours_per_year),
+    do: %{
+      "all_hours" => all_hours,
+      "hours_per_month" => hours_per_month,
+      "hours_per_year" => hours_per_year
     }
-  end
-
-  # def sum_reports() do
-  #   all_hours = Enum.
-  #   %{
-  #     "all_hours" => %{
-  #       "cleiton" => 704
-  #     },
-  #     "hours_per_month" => %{
-  #       "cleiton" => %{
-  #         "abril" => 21
-  #       }
-  #     },
-  #     "hours_per_year" => %{
-  #       "cleiton" => %{
-  #         2016 => 87
-  #       }
-  #     }
-  #   }
-
-  #   all_hours =
-  # end
 end
